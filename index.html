@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Password Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, #2ea5ad33, transparent 40%),
+                linear-gradient(135deg, #040428, #0a0f1f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+        }
+
+        .container {
+            width: 380px;
+            padding: 30px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.15);
+            animation: fadeIn 1s ease;
+        }
+
+
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00e6f5;
+
+        }
+
+        h2:hover {
+            color: #43ffef;
+
+        }
+
+        .output-box {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .output-box input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px 0 0 8px;
+            border: none;
+            outline: none;
+            background: #020617;
+            color: #00f0ff;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .output-box button {
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #00f0ff, #7c7cff);
+            color: #000;
+            font-size: 16px;
+        }
+
+        .output-box button:hover {
+            box-shadow: 0 0 15px #00f0ff;
+        }
+
+        .length-box label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00f0ff;
+        }
+
+        .options {
+            margin: 18px 0;
+
+        }
+
+        .options label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin: 6px 0;
+        }
+
+        .options input {
+            accent-color: #7c7cff;
+
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #00f0ff, #7c7cff);
+            color: #000;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .generate-btn:hover {
+            box-shadow: 0 0 25px #00f0ff;
+            transform: scale(1.0);
+            font-weight: bold;
+        }
+
+        .strength {
+            margin-top: 18px;
+            padding: 20px;
+        }
+
+        .strength-text {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>CYBER PASSWORD Generator</h2>
+
+        <div class="output-box">
+            <input type="text" id="password" readonly placeholder="••••••••">
+            <button onclick="copyPassword()">⧉</button>
+        </div>
+
+        <div class="length-box">
+            <label>Password Length <span id="lengthValue">12</span></label>
+            <input type="range" min="6" max="" value="12" id="length">
+        </div>
+
+        <div class="options">
+            <label>Uppercase <input type="checkbox" id="upper" checked></label>
+            <label>Lowercase <input type="checkbox" id="lower" checked></label>
+            <label>Numbers <input type="checkbox" id="number" checked></label>
+            <label>Symbols <input type="checkbox" id="symbol"></label>
+        </div>
+
+        <button class="generate-btn" onclick="generatePassword()">GENERATE</button>
+
+        <div class="strength">
+            <div class="strength-text" id="strengthText">Strength: —</div>
+            <div class="strength-bar">
+                <span id="strengthBar"></span>
+            </div>
+        </div>
+
+        <div class="footer">Made By Raghav Arora</div>
+    </div>
+
+    <script>
+        const passwordField = document.getElementById("password");
+        const lengthSlider = document.getElementById("length");
+        const lengthValue = document.getElementById("lengthValue");
+        const strengthText = document.getElementById("strengthText");
+        const strengthBar = document.getElementById("strengthBar");
+
+        lengthSlider.oninput = () => lengthValue.textContent = lengthSlider.value;
+
+        function generatePassword() {
+            const length = lengthSlider.value;
+            const sets = [
+                document.getElementById("upper").checked && "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                document.getElementById("lower").checked && "abcdefghijklmnopqrstuvwxyz",
+                document.getElementById("number").checked && "0123456789",
+                document.getElementById("symbol").checked && "!@#$%^&*()_+{}[]<>?"
+            ].filter(Boolean);
+
+            if (!sets.length) return alert("Select at least one option!");
+
+            let all = sets.join("");
+            let pass = "";
+            for (let i = 0; i < length; i++)
+                pass += all[Math.floor(Math.random() * all.length)];
+
+            passwordField.value = pass;
+            checkStrength(pass);
+        }
+
+        function checkStrength(p) {
+            let s = 0;
+            if (p.length >= 8) s++;
+            if (/[A-Z]/.test(p)) s++;
+            if (/[0-9]/.test(p)) s++;
+            if (/[^A-Za-z0-9]/.test(p)) s++;
+
+            strengthBar.className = "";
+            if (s <= 2) {
+                strengthText.textContent = "Strength: Weak";
+                strengthBar.classList.add("weak");
+            } else if (s === 3) {
+                strengthText.textContent = "Strength: Medium";
+                strengthBar.classList.add("medium");
+            } else {
+                strengthText.textContent = "Strength: Strong";
+                strengthBar.classList.add("strong");
+            }
+        }
+
+        function copyPassword() {
+            if (!passwordField.value) return;
+            navigator.clipboard.writeText(passwordField.value);
+            alert("Copied to clipboard!");
+        }
+    </script>
+
+</body>
+
+</html>
